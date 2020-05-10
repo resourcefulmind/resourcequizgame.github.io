@@ -2,6 +2,7 @@ const question = document.getElementById("question");
 const choices = Array.from(document.getElementsByClassName("choice-text"));
 const questionCounterText = document.getElementById("questionCounter");
 const scoreText = document.getElementById("score");
+const next = document.querySelector(".next-prefix");
 let currentQuestion = {};
 let acceptingAnswers = true;
 let score = 0;
@@ -91,6 +92,8 @@ getNewQuestion = () => {
   acceptingAnswers = true;
 };
 
+next.addEventListener("click", getNewQuestion);
+
 choices.forEach((choice) => {
   choice.addEventListener("click", (e) => {
     if (!acceptingAnswers) return;
@@ -98,18 +101,27 @@ choices.forEach((choice) => {
     acceptingAnswers = false;
     const selectedChoice = e.target;
     const selectedAnswer = selectedChoice.dataset["number"];
-
+    const correctChoice = document.querySelector(
+      `p[data-number="${currentQuestion.answer}"]`
+    );
     const classToApply =
       selectedAnswer == currentQuestion.answer ? "correct" : "incorrect";
     if (classToApply === "correct") {
       incrementScore(CORRECT_BONUS);
+      selectedChoice.parentElement.classList.add(classToApply);
+      setTimeout(() => {
+        selectedChoice.parentElement.classList.remove(classToApply);
+        getNewQuestion();
+      }, 1000);
+    } else {
+      correctChoice.parentElement.classList.add("correct");
+      selectedChoice.parentElement.classList.add(classToApply);
+      setTimeout(() => {
+        correctChoice.parentElement.classList.remove("correct");
+        selectedChoice.parentElement.classList.remove(classToApply);
+        getNewQuestion();
+      }, 1000);
     }
-
-    selectedChoice.parentElement.classList.add(classToApply);
-    setTimeout(() => {
-      selectedChoice.parentElement.classList.remove(classToApply);
-      getNewQuestion();
-    }, 1000);
   });
 });
 
